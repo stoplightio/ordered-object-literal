@@ -1,0 +1,105 @@
+/* eslint-disable sort-keys */
+import createOrderedObj, {
+  deserialize,
+  serialize,
+  setOrder,
+  ORDER_KEY_ID,
+} from '../index.mjs';
+
+describe('Ordered object literal', () => {
+  describe('set trap', () => {
+    it('given missing property, adds it', () => {
+      const obj = createOrderedObj({ c: false });
+      obj.x = true;
+      expect(Object.keys(obj)).to.deep.equal(['c', 'x']);
+      expect(obj).to.deep.equal({ c: false, x: true });
+    });
+
+    it('given existing property, overwrites it', () => {
+      const obj = createOrderedObj({ x: false });
+      obj.x = true;
+      expect(obj).to.have.keys(['x']);
+      expect(obj).to.deep.equal({ x: true });
+    });
+
+    it('given numeric key, retains its real position', () => {
+      const obj = createOrderedObj({ x: true });
+      obj['0'] = true;
+      expect(Object.keys(obj)).to.deep.equal(['x', '0']);
+      expect(obj).to.deep.equal({ 0: true, x: true });
+    });
+  });
+
+  describe('delete trap', () => {
+    it('given missing property, does nothing', () => {
+      const obj = createOrderedObj({ a: 0 });
+      delete obj.x;
+      expect(obj).to.have.keys(['a']);
+      expect(obj).to.deep.equal({ a: 0 });
+    });
+
+    it('given existing property, removes it', () => {
+      const obj = createOrderedObj({ a: 0, b: 0, c: 0 });
+      delete obj.b;
+      expect(obj).to.have.keys(['a', 'c']);
+      expect(obj).to.deep.equal({ a: 0, c: 0 });
+    });
+  });
+
+  describe('ownKeys trap', () => {
+    it('returns own string keys', () => {
+      const obj = createOrderedObj({ x: true });
+      expect(Object.keys(obj)).to.deep.equal(['x']);
+      expect(obj).to.deep.equal({ x: true });
+    });
+
+    it('returns own symbol keys', () => {
+      const symbolX = Symbol('x');
+      const obj = createOrderedObj({ [symbolX]: 0 });
+      expect(Object.getOwnPropertySymbols(obj)).to.deep.equal([
+        symbolX,
+        Symbol.for(ORDER_KEY_ID),
+      ]);
+    });
+
+    it('returns own keys', () => {
+      const symbolX = Symbol('x');
+      const obj = createOrderedObj({ x: false, [symbolX]: 0 });
+      expect(Reflect.ownKeys(obj)).to.deep.equal([
+        'x',
+        symbolX,
+        Symbol.for(ORDER_KEY_ID),
+      ]);
+    });
+  });
+
+  describe('defineProperty trap', () => {
+    it('defines new property', () => {
+      const obj = createOrderedObj({ x: true });
+      expect(Reflect.defineProperty(obj, 'foo', {})).to.be.true;
+    });
+
+    it('given numeric key, retains its real position', () => {
+      const obj = createOrderedObj({ x: true });
+      Reflect.defineProperty(obj, '0', { enumerable: true });
+      expect(Object.keys(obj)).to.deep.equal(['x', '0']);
+    });
+  });
+
+  describe('(de)serialization', () => {
+    it('works', () => {
+      const obj = createOrderedObj({ x: false, ['0']: 'boo' });
+      setOrder(obj, ['x', '0']);
+      obj.c = createOrderedObj({ '2': 0, b: false, '1': 'x' });
+      setOrder(obj.c, ['2', 'b', '1']);
+
+      const x = deserialize(
+        JSON.parse(JSON.stringify(serialize(obj, true))),
+        true,
+      );
+
+      expect(Object.keys(x)).to.deep.equal(['x', '0', 'c']);
+      expect(Object.keys(x.c)).to.deep.equal(['2', 'b', '1']);
+    });
+  });
+});

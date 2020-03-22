@@ -1,0 +1,7 @@
+.idea/
+node_modules/
+.cache/
+bin/
+.nyc_output
+yarn-error.log
+src/index.cjs
