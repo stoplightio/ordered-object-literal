@@ -100,6 +100,13 @@ describe('Ordered object literal', () => {
 
       expect(Object.keys(x)).to.deep.equal(['x', '0', 'c']);
       expect(Object.keys(x.c)).to.deep.equal(['2', 'b', '1']);
+
+      expect(x[Symbol.for(ORDER_KEY_ID)]).to.deep.equal([
+        'x',
+        '0',
+        'c',
+        Symbol.for(ORDER_KEY_ID),
+      ]);
     });
   });
 });

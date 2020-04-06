@@ -55,10 +55,6 @@ export function setOrder(target, order) {
   if (ORDER_KEY in target) {
     target[ORDER_KEY].length = 0;
     target[ORDER_KEY].push(...order);
-    if (!order.includes(ORDER_KEY)) {
-      target[ORDER_KEY].push(ORDER_KEY);
-    }
-
     return true;
   } else {
     return Reflect.defineProperty(target, ORDER_KEY, {
@@ -73,13 +69,13 @@ export function getOrder(target) {
 }
 
 export function serialize(target, deep) {
-  if (ORDER_KEY in target) {
-    Object.defineProperty(target, STRINGIFIED_ORDER_KEY, {
-      enumerable: true,
-      value: target[ORDER_KEY],
-    });
+  const newTarget = { ...target };
 
-    delete target[ORDER_KEY];
+  if (ORDER_KEY in target) {
+    Object.defineProperty(newTarget, STRINGIFIED_ORDER_KEY, {
+      enumerable: true,
+      value: target[ORDER_KEY].filter(item => item !== ORDER_KEY),
+    });
   }
 
   if (deep) {
@@ -87,21 +83,23 @@ export function serialize(target, deep) {
       if (key === STRINGIFIED_ORDER_KEY) continue;
       const value = target[key];
       if (value !== null && typeof value === 'object') {
-        target[key] = serialize(value, true);
+        newTarget[key] = serialize(value, true);
       }
     }
   }
 
-  return { ...target };
+  return newTarget;
 }
 
 export function deserialize(target, deep) {
-  const newTarget = createObj(target);
-  if (STRINGIFIED_ORDER_KEY in target) {
-    const order = target[STRINGIFIED_ORDER_KEY];
-    delete target[STRINGIFIED_ORDER_KEY];
-    setOrder(newTarget, order);
-  }
+  const newTarget = createObj(
+    target,
+    STRINGIFIED_ORDER_KEY in target
+      ? target[STRINGIFIED_ORDER_KEY]
+      : Reflect.ownKeys(target),
+  );
+
+  delete newTarget[STRINGIFIED_ORDER_KEY];
 
   if (deep) {
     for (const key of Object.keys(target)) {
