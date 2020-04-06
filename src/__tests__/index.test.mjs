@@ -28,21 +28,43 @@ describe('Ordered object literal', () => {
       expect(Object.keys(obj)).to.deep.equal(['x', '0']);
       expect(obj).to.deep.equal({ 0: true, x: true });
     });
+
+    it('given existing non-extensible, throws', () => {
+      const target = Object.preventExtensions({});
+
+      const obj = createOrderedObj(target);
+      expect(() => void (obj.d = true)).to.throw(TypeError);
+      expect(obj).not.to.have.property('d');
+    });
   });
 
   describe('delete trap', () => {
     it('given missing property, does nothing', () => {
       const obj = createOrderedObj({ a: 0 });
-      delete obj.x;
+      expect(delete obj.x).to.be.true;
       expect(obj).to.have.keys(['a']);
       expect(obj).to.deep.equal({ a: 0 });
     });
 
     it('given existing property, removes it', () => {
       const obj = createOrderedObj({ a: 0, b: 0, c: 0 });
-      delete obj.b;
+      expect(delete obj.b).to.be.true;
+      expect(obj).not.to.have.property('b');
       expect(obj).to.have.keys(['a', 'c']);
       expect(obj).to.deep.equal({ a: 0, c: 0 });
+    });
+
+    it('given existing non-configurable property, throws', () => {
+      const target = { a: 0, c: 0 };
+      Reflect.defineProperty(target, 'b', {
+        enumerable: true,
+        value: 0,
+      });
+
+      const obj = createOrderedObj(target);
+      expect(() => void delete obj.b).to.throw(TypeError);
+      expect(obj).to.have.keys(['a', 'b', 'c']);
+      expect(obj).to.deep.equal({ a: 0, b: 0, c: 0 });
     });
   });
 

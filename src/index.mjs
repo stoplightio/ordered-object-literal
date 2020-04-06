@@ -17,14 +17,16 @@ const traps = {
   },
 
   deleteProperty(target, key) {
-    if (key in target && ORDER_KEY in target) {
+    const deleted = Reflect.deleteProperty(target, key);
+
+    if (deleted && key in target && ORDER_KEY in target) {
       const index = target[ORDER_KEY].indexOf(key);
       if (index !== -1) {
         target[ORDER_KEY].splice(index, 1);
       }
     }
 
-    return true;
+    return deleted;
   },
 
   ownKeys(target) {
@@ -36,12 +38,14 @@ const traps = {
   },
 
   set(target, key, value) {
-    if (!(key in target) && ORDER_KEY in target) {
+    const hasKey = key in target;
+    const set = Reflect.set(target, key, value);
+
+    if (set && !hasKey && ORDER_KEY in target) {
       target[ORDER_KEY].push(key);
     }
 
-    target[key] = value;
-    return true;
+    return set;
   },
 };
 
