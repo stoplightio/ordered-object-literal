@@ -7,10 +7,10 @@ const STRINGIFIED_ORDER_KEY = String(ORDER_KEY);
 
 const traps = {
   defineProperty(target, key, descriptor) {
-    if (key === ORDER_KEY) {
-      descriptor.value.push(ORDER_KEY);
-    } else if (!(key in target) && ORDER_KEY in target) {
+    if (!(key in target) && ORDER_KEY in target) {
       target[ORDER_KEY].push(key);
+    } else if (key === ORDER_KEY && descriptor.value.lastIndexOf(ORDER_KEY) === -1) {
+      descriptor.value.push(ORDER_KEY);
     }
 
     return Reflect.defineProperty(target, key, descriptor);

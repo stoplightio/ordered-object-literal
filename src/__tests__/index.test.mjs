@@ -106,6 +106,13 @@ describe('Ordered object literal', () => {
       Reflect.defineProperty(obj, '0', { enumerable: true });
       expect(Object.keys(obj)).to.deep.equal(['x', '0']);
     });
+
+    it('handles recreation of already trapped object', () => {
+      const obj = createOrderedObj({ b: 0 });
+      const newObj = createOrderedObj({ ...obj }, Reflect.ownKeys(obj));
+      expect(newObj).to.have.keys(['b']);
+      expect(newObj).to.deep.equal({ b: 0 });
+    });
   });
 
   describe('(de)serialization', () => {
