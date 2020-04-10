@@ -34,10 +34,11 @@
   "scripts": {
     "build": "NODE_ENV=production rollup -c",
     "lint": "eslint --cache --cache-location .cache/ src/**/*.mjs",
-    "test": "NODE_ENV=test mocha --experimental-modules --config .mocharc ./src/__tests__/*.mjs",
-    "prepublish": "yarn lint && yarn test && yarn build"
+    "test": " NODE_ENV=test c8 mocha --experimental-modules --config .mocharc ./src/__tests__/*.mjs",
+    "prepublish": "npm run lint && npm run test && npm run build"
   },
   "devDependencies": {
+    "c8": "7.1.0",
     "chai": "4.2.0",
     "eslint": "6.8.0",
     "eslint-config-prettier": "6.10.0",
