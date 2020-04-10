@@ -1,7 +1,7 @@
 .idea/
 node_modules/
 .cache/
-bin/
-.nyc_output
-yarn-error.log
+.nyc_output/
+coverage/
+*.log
 src/index.cjs
