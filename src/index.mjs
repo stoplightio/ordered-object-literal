@@ -20,9 +20,10 @@ const traps = {
   },
 
   deleteProperty(target, key) {
+    const hasKey = key in target;
     const deleted = Reflect.deleteProperty(target, key);
 
-    if (deleted && key in target && ORDER_KEY in target) {
+    if (deleted && hasKey && ORDER_KEY in target) {
       const index = target[ORDER_KEY].indexOf(key);
       if (index !== -1) {
         target[ORDER_KEY].splice(index, 1);

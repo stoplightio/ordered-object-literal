@@ -51,6 +51,11 @@ describe('Ordered object literal', () => {
       expect(delete obj.b).to.be.true;
       expect(obj).not.to.have.property('b');
       expect(obj).to.have.keys(['a', 'c']);
+      expect(obj[Symbol.for(ORDER_KEY_ID)]).to.deep.equal([
+        'a',
+        'c',
+        Symbol.for(ORDER_KEY_ID),
+      ]);
       expect(obj).to.deep.equal({ a: 0, c: 0 });
     });
 
