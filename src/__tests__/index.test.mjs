@@ -122,19 +122,49 @@ describe('Ordered object literal', () => {
       obj.c = createOrderedObj({ '2': 0, b: false, '1': 'x' });
       setOrder(obj.c, ['2', 'b', '1']);
 
-      const x = deserialize(
+      const deserializedObj = deserialize(
         JSON.parse(JSON.stringify(serialize(obj, true))),
         true,
       );
 
-      expect(Object.keys(x)).to.deep.equal(['x', '0', 'c']);
-      expect(Object.keys(x.c)).to.deep.equal(['2', 'b', '1']);
+      expect(Object.keys(deserializedObj)).to.deep.equal(['x', '0', 'c']);
+      expect(Object.keys(deserializedObj.c)).to.deep.equal(['2', 'b', '1']);
 
-      expect(x[Symbol.for(ORDER_KEY_ID)]).to.deep.equal([
+      expect(deserializedObj[Symbol.for(ORDER_KEY_ID)]).to.deep.equal([
         'x',
         '0',
         'c',
         Symbol.for(ORDER_KEY_ID),
+      ]);
+    });
+
+    it('supports arrays', () => {
+      const obj = createOrderedObj(
+        {
+          x: [
+            0,
+            createOrderedObj(
+              {
+                [0]: false,
+                foo: true,
+                bar: [1, createOrderedObj({ c: true }, ['c'])],
+              },
+              ['0', 'foo', 'bar'],
+            ),
+          ],
+        },
+        ['x'],
+      );
+
+      const deserializedObj = deserialize(
+        JSON.parse(JSON.stringify(serialize(obj, true))),
+        true,
+      );
+
+      expect(Object.keys(deserializedObj.x[1])).to.deep.equal([
+        '0',
+        'foo',
+        'bar',
       ]);
     });
   });

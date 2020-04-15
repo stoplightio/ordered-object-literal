@@ -1,4 +1,4 @@
-const TIMESTAMP = Math.floor(Date.now() / 3600000);
+const TIMESTAMP = Math.floor(Date.now() / 3600000); // 1-day should be sufficient in most circumstances
 
 export const ORDER_KEY_ID = `__object_order_${TIMESTAMP}__`;
 
@@ -9,7 +9,10 @@ const traps = {
   defineProperty(target, key, descriptor) {
     if (!(key in target) && ORDER_KEY in target) {
       target[ORDER_KEY].push(key);
-    } else if (key === ORDER_KEY && descriptor.value.lastIndexOf(ORDER_KEY) === -1) {
+    } else if (
+      key === ORDER_KEY &&
+      descriptor.value.lastIndexOf(ORDER_KEY) === -1
+    ) {
       descriptor.value.push(ORDER_KEY);
     }
 
@@ -72,13 +75,30 @@ export function getOrder(target) {
   return target[ORDER_KEY];
 }
 
+function serializeArray(target) {
+  const newTarget = target.slice();
+
+  for (let i = 0; i < newTarget.length; i += 1) {
+    const value = newTarget[i];
+    if (isObject(value)) {
+      newTarget[i] = Array.isArray(value)
+        ? serializeArray(value)
+        : serialize(value, true);
+    }
+  }
+
+  return newTarget;
+}
+
 export function serialize(target, deep) {
+  assertObjectLiteral(target, 'Invalid target provided');
+
   const newTarget = { ...target };
 
   if (ORDER_KEY in target) {
     Object.defineProperty(newTarget, STRINGIFIED_ORDER_KEY, {
       enumerable: true,
-      value: target[ORDER_KEY].filter(item => item !== ORDER_KEY),
+      value: target[ORDER_KEY].filter((item) => item !== ORDER_KEY),
     });
   }
 
@@ -86,8 +106,10 @@ export function serialize(target, deep) {
     for (const key of Object.keys(target)) {
       if (key === STRINGIFIED_ORDER_KEY) continue;
       const value = target[key];
-      if (value !== null && typeof value === 'object') {
-        newTarget[key] = serialize(value, true);
+      if (isObject(value)) {
+        newTarget[key] = Array.isArray(value)
+          ? serializeArray(value)
+          : serialize(value, true);
       }
     }
   }
@@ -95,7 +117,22 @@ export function serialize(target, deep) {
   return newTarget;
 }
 
+function deserializeArray(target) {
+  for (let i = 0; i < target.length; i += 1) {
+    const value = target[i];
+    if (isObject(value)) {
+      target[i] = Array.isArray(value)
+        ? deserializeArray(value)
+        : deserialize(value, true);
+    }
+  }
+
+  return target;
+}
+
 export function deserialize(target, deep) {
+  assertObjectLiteral(target, 'Invalid target provided');
+
   const newTarget = createObj(
     target,
     STRINGIFIED_ORDER_KEY in target
@@ -108,8 +145,10 @@ export function deserialize(target, deep) {
   if (deep) {
     for (const key of Object.keys(target)) {
       const value = target[key];
-      if (value !== null && typeof value === 'object') {
-        target[key] = deserialize(value, true);
+      if (isObject(value)) {
+        target[key] = Array.isArray(value)
+          ? deserializeArray(value)
+          : deserialize(value, true);
       }
     }
   }
@@ -119,4 +158,48 @@ export function deserialize(target, deep) {
 
 export function isOrderedObject(target) {
   return ORDER_KEY in target;
+}
+
+function isObject(maybeObj) {
+  return maybeObj !== null && typeof maybeObj === 'object';
+}
+
+export function isObjectLiteral(obj) {
+  if (!isObject(obj)) return false;
+  if (obj[Symbol.toStringTag] !== void 0) {
+    const proto = Object.getPrototypeOf(obj);
+    return proto === null || proto === Object.prototype;
+  }
+
+  return toStringTag(obj) === 'Object';
+}
+
+export function toStringTag(obj) {
+  const tag = obj[Symbol.toStringTag];
+  if (typeof tag === 'string') {
+    return tag;
+  }
+
+  const name = Reflect.apply(Object.prototype.toString, obj, []);
+  return name.slice(8, name.length - 1);
+}
+
+function assertObjectLiteral(maybeObj, message) {
+  if (isDevEnv() && !isObjectLiteral(maybeObj)) {
+    throw new TypeError(message);
+  }
+}
+
+function isDevEnv() {
+  if (
+    typeof process === 'undefined' ||
+    !isObjectLiteral(process) ||
+    !isObjectLiteral(process.env)
+  ) {
+    return false;
+  }
+
+  return (
+    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+  );
 }

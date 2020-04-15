@@ -1,18 +1,17 @@
 {
   "parserOptions": {
-    "ecmaVersion": 2019,
+    "ecmaVersion": 2020,
     "sourceType": "module"
   },
   "env": {
     "es6": true,
-    "node": true
+    "shared-node-browser": true
   },
   "extends": ["eslint:recommended", "plugin:prettier/recommended"],
   "rules": {
     "func-names": "off",
     "no-param-reassign": "warn",
     "no-restricted-syntax": ["error", "ArrayPattern"],
-    "function-paren-newline": "off",
     "global-require": "warn",
     "sort-keys": "error",
     "no-continue": "off",
