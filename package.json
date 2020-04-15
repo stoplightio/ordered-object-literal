@@ -1,15 +1,15 @@
 {
-  "name": "ordered-object-literal",
-  "version": "0.0.4",
+  "name": "@stoplight/ordered-object-literal",
+  "version": "0.0.0",
   "description": "Object literal maintaining its properties in the order they were added",
   "keywords": [
     "object",
     "object-literal",
     "iteration"
   ],
-  "homepage": "https://github.com/P0lip/ordered-object-literal",
+  "homepage": "https://github.com/stoplightio/ordered-object-literal",
   "bugs": {
-    "url": "https://github.com/P0lip/ordered-object-literal/issues"
+    "url": "https://github.com/stoplightio/ordered-object-literal/issues"
   },
   "engines": {
     "node": ">=8"
@@ -26,10 +26,10 @@
     "require": "./src/index.cjs"
   },
   "license": "MIT",
-  "author": "P0lip",
+  "author": "Stoplight <support@stoplight.io>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/P0lip/ordered-object-literal.git"
+    "url": "git+https://github.com/stoplightio/ordered-object-literal.git"
   },
   "scripts": {
     "build": "NODE_ENV=production rollup -c",
