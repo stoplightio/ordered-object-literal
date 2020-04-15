@@ -54,6 +54,7 @@ const traps = {
 };
 
 export default function createObj(target, order = Reflect.ownKeys(target)) {
+  assertObjectLiteral(target);
   const t = new Proxy(target, traps);
   setOrder(t, order);
   return t;
@@ -165,7 +166,7 @@ function isObject(maybeObj) {
   return maybeObj !== null && typeof maybeObj === 'object';
 }
 
-export function isObjectLiteral(obj) {
+function isObjectLiteral(obj) {
   if (!isObject(obj)) return false;
   if (obj[Symbol.toStringTag] !== void 0) {
     const proto = Object.getPrototypeOf(obj);
@@ -175,7 +176,7 @@ export function isObjectLiteral(obj) {
   return toStringTag(obj) === 'Object';
 }
 
-export function toStringTag(obj) {
+function toStringTag(obj) {
   const tag = obj[Symbol.toStringTag];
   if (typeof tag === 'string') {
     return tag;
@@ -194,8 +195,8 @@ function assertObjectLiteral(maybeObj, message) {
 function isDevEnv() {
   if (
     typeof process === 'undefined' ||
-    !isObjectLiteral(process) ||
-    !isObjectLiteral(process.env)
+    !isObject(process) ||
+    !isObject(process.env)
   ) {
     return false;
   }

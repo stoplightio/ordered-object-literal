@@ -173,4 +173,32 @@ describe('Ordered object literal', () => {
       ]);
     });
   });
+
+  describe('when array is given as input', () => {
+    afterEach(() => {
+      delete process.env.NODE_ENV;
+    });
+
+    it('given test environment, throws', () => {
+      process.env.NODE_ENV = 'test';
+
+      expect(createOrderedObj.bind(void 0, [])).to.throw();
+    });
+
+    it('given development environment, throws', () => {
+      process.env.NODE_ENV = 'development';
+
+      expect(createOrderedObj.bind(void 0, [])).to.throw();
+    });
+
+    it('given production environment, does not throw', () => {
+      process.env.NODE_ENV = 'production';
+
+      expect(createOrderedObj.bind(void 0, [])).not.to.throw();
+    });
+
+    it('given no environment set, does not throw', () => {
+      expect(createOrderedObj.bind(void 0, [])).not.to.throw();
+    });
+  });
 });

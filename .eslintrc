@@ -26,7 +26,8 @@
       "files": ["src/__tests__/**/*.mjs"],
       "extends": ["plugin:chai-expect/recommended"],
       "env": {
-        "mocha": true
+        "mocha": true,
+        "node": true
       },
       "globals": {
         "expect": true
