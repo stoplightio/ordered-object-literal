@@ -41,4 +41,4 @@ const trackedReversedObj = box(myObj, ['b', 'a']);
 
 ## LICENSE
 
-[MIT](https://github.com/P0lip/ordered-object-literal/blob/master/LICENSE)
+[Apache License 2.0](https://github.com/stoplightio/ordered-object-literal/blob/master/LICENSE)
