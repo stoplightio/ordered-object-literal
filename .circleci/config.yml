@@ -18,13 +18,6 @@ jobs:
       - checkout
       - install_and_test
 
-  test_node_dubnium:
-    docker:
-      - image: circleci/node:dubnium
-    steps:
-      - checkout
-      - install_and_test
-
   test_node_latest:
     docker:
       - image: circleci/node:latest
@@ -46,7 +39,6 @@ workflows:
   test_and_release:
     jobs:
       - test_node_lts
-      - test_node_dubnium
       - test_node_latest
       - release:
           filters:
@@ -57,5 +49,4 @@ workflows:
                 - alpha
           requires:
             - test_node_lts
-            - test_node_dubnium
             - test_node_latest
