@@ -6,8 +6,6 @@ commands:
       Install everything required to run the test suite, then run it.
     steps:
       - run: npm ci
-      - run: npm run test
-      - run: npm run lint
 
 jobs:
   # https://nodejs.org/en/about/releases/
