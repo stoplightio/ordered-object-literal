@@ -201,4 +201,25 @@ describe('Ordered object literal', () => {
       expect(createOrderedObj.bind(void 0, [])).not.to.throw();
     });
   });
+
+  it('survives freezing', () => {
+    const obj = createOrderedObj({ 0: 'c', b: 0 }, ['0', 'b']);
+    Object.freeze(obj);
+    expect(obj).to.deep.equal({ 0: 'c', b: 0 });
+    expect(Object.keys(obj)).to.deep.equal(['0', 'b']);
+  });
+
+  it('survives sealing', () => {
+    const obj = createOrderedObj({ 0: 'c', b: 0 }, ['0', 'b']);
+    Object.seal(obj);
+    expect(obj).to.deep.equal({ 0: 'c', b: 0 });
+    expect(Object.keys(obj)).to.deep.equal(['0', 'b']);
+  });
+
+  it('survives preventExtensions', () => {
+    const obj = createOrderedObj({ 0: 'c', b: 0 }, ['0', 'b']);
+    Object.preventExtensions(obj);
+    expect(obj).to.deep.equal({ 0: 'c', b: 0 });
+    expect(Object.keys(obj)).to.deep.equal(['0', 'b']);
+  });
 });

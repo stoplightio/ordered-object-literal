@@ -10,6 +10,7 @@ const traps = {
     if (!(key in target) && ORDER_KEY in target) {
       target[ORDER_KEY].push(key);
     } else if (
+      'value' in descriptor &&
       key === ORDER_KEY &&
       descriptor.value.lastIndexOf(ORDER_KEY) === -1
     ) {
