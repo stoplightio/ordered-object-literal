@@ -23,6 +23,7 @@
   "main": "./src/index.cjs",
   "module": "./src/index.mjs",
   "exports": {
+    "types": "./src/index.d.ts",
     "import": "./src/index.mjs",
     "require": "./src/index.cjs"
   },
