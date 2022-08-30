@@ -15,9 +15,7 @@
     "node": ">=8"
   },
   "files": [
-    "src/index.d.ts",
-    "src/index.cjs",
-    "src/index.mjs"
+    "src"
   ],
   "typings": "./src/index.d.ts",
   "main": "./src/index.cjs",
@@ -27,7 +25,7 @@
     "import": "./src/index.mjs",
     "require": "./src/index.cjs"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "Stoplight <support@stoplight.io>",
   "repository": {
     "type": "git",
