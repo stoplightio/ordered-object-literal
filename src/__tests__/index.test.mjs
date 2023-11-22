@@ -15,6 +15,13 @@ describe('Ordered object literal', () => {
       expect(obj).to.deep.equal({ c: false, x: true });
     });
 
+    it('given missing own property, adds it', () => {
+      const obj = createOrderedObj({});
+      obj.toString = 'abc';
+      expect(Object.keys(obj)).to.deep.equal(['toString']);
+      expect(obj).to.deep.equal({ toString: 'abc' });
+    });
+
     it('given existing property, overwrites it', () => {
       const obj = createOrderedObj({ x: false });
       obj.x = true;
@@ -104,6 +111,9 @@ describe('Ordered object literal', () => {
     it('defines new property', () => {
       const obj = createOrderedObj({ x: true });
       expect(Reflect.defineProperty(obj, 'foo', {})).to.be.true;
+      expect(Reflect.defineProperty(obj, 'toString', { enumerable: true })).to
+        .be.true;
+      expect(Object.keys(obj)).to.deep.equal(['x', 'toString']);
     });
 
     it('given numeric key, retains its real position', () => {
