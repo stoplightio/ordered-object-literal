@@ -7,7 +7,8 @@ const STRINGIFIED_ORDER_KEY = String(ORDER_KEY);
 
 const traps = {
   defineProperty(target, key, descriptor) {
-    if (!(key in target) && ORDER_KEY in target) {
+    const hasKey = Object.prototype.hasOwnProperty.call(target, key);
+    if (!hasKey && ORDER_KEY in target) {
       target[ORDER_KEY].push(key);
     } else if (
       'value' in descriptor &&
@@ -21,7 +22,7 @@ const traps = {
   },
 
   deleteProperty(target, key) {
-    const hasKey = key in target;
+    const hasKey = Object.prototype.hasOwnProperty.call(target, key);
     const deleted = Reflect.deleteProperty(target, key);
 
     if (deleted && hasKey && ORDER_KEY in target) {
@@ -43,7 +44,7 @@ const traps = {
   },
 
   set(target, key, value) {
-    const hasKey = key in target;
+    const hasKey = Object.prototype.hasOwnProperty.call(target, key);
     const set = Reflect.set(target, key, value);
 
     if (set && !hasKey && ORDER_KEY in target) {
