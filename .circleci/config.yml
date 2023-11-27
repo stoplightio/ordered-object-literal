@@ -18,7 +18,7 @@ jobs:
 
   test_node_latest:
     docker:
-      - image: cimg/node:latest
+      - image: cimg/node:current
     steps:
       - checkout
       - install_and_test
