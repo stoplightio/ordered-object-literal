@@ -6,26 +6,27 @@ commands:
       Install everything required to run the test suite, then run it.
     steps:
       - run: npm ci
+      - run: npm test
 
 jobs:
   # https://nodejs.org/en/about/releases/
   test_node_lts:
     docker:
-      - image: circleci/node:lts
+      - image: cimg/node:lts
     steps:
       - checkout
       - install_and_test
 
   test_node_latest:
     docker:
-      - image: circleci/node:latest
+      - image: cimg/node:current
     steps:
       - checkout
       - install_and_test
 
   release:
     docker:
-      - image: circleci/node:lts
+      - image: cimg/node:lts
     steps:
       - checkout
       - run: npm ci
